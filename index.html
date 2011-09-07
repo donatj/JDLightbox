@@ -10,7 +10,7 @@
 		</script>
 		<style type="text/css">
 		.jdlightbox_modal_bg {
-			background: rgba( 0,0,0, .7);
+			background: rgba( 0,0,0, .8);
 			position: fixed;
 			height: 100%;
 			width: 100%;
@@ -21,28 +21,37 @@
 		}
 		
 		.jdlightbox_modal_bg figure {
-			padding: 10px;
-			background: #666;
-			background: rgba( 60,60,60, .7);
+			padding: 6px;
+			background: #222;
+			border: 1px solid #666;
 			color: white;
-			float: left;
-			position: absolute;
-			border-radius: 10px;
-			left: 50%;
-			margin-left: -25%;
-			box-shadow: 0 0 20px rgba(0, 0, 0, 0.9)
-			
+			display: table;
+			margin: 22px auto;
+			/* margin-left: -25%; */
+			/* border-radius: 6px; */
+			/* box-shadow: 0 0 20px rgba(0, 0, 0, 0.9); */
+			font: 12px/20px Arial;
+		}
+		
+		.jdlightbox_modal_bg figcaption {
+			text-align: center;
 		}
 		
 		.jdlightbox_modal_bg figure img {
-			border-radius: 10px;
+			max-width: 100%;
+			/* border-radius: 6px; */
 		}
 		</style>
 	</head>
 	<body>
 		<a href="sakakibaraonsen.jpg" data-jdlightbox="jdlightbox" title="Not An Image">Not an image</a>
-		<a href="sakakibaraonsen.jpg" data-jdlightbox="jdlightbox" title="An Image">
-			<img src="sakakibaraonsen.jpg" width="60">
-		</a>
+		
+		<br /><br />
+		
+		<a href="http://www.woot.com" data-jdlightbox="jdlightbox" data-jdlightbox-iframe=true title="An Awesome iFrame">iFrame Bro</a>
+		
+		<br /><br />
+		
+		<a href="sakakibaraonsen.jpg" data-jdlightbox="jdlightbox" title="An Image"><img src="sakakibaraonsen.jpg" width="60"></a>
 	</body>
 </html>
