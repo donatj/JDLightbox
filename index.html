@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/mootools/1.3.2/mootools-yui-compressed.js"></script>
+		<script src="jdlightbox.js"></script>
+		<script>
+		window.addEvent('domready', function(){
+			new JDLightbox();
+		});
+		</script>
+		<style type="text/css">
+		.jdlightbox_modal_bg {
+			background: rgba( 0,0,0, .7);
+			position: fixed;
+			height: 100%;
+			width: 100%;
+			z-index: 1000;
+			position: fixed;
+			top: 0;
+			left: 0;
+		}
+		
+		.jdlightbox_modal_bg figure {
+			padding: 10px;
+			background: #666;
+			background: rgba( 60,60,60, .7);
+			color: white;
+			float: left;
+			position: absolute;
+			border-radius: 10px;
+			left: 50%;
+			margin-left: -25%;
+			box-shadow: 0 0 20px rgba(0, 0, 0, 0.9)
+			
+		}
+		
+		.jdlightbox_modal_bg figure img {
+			border-radius: 10px;
+		}
+		</style>
+	</head>
+	<body>
+		<a href="sakakibaraonsen.jpg" data-jdlightbox="jdlightbox" title="Not An Image">Not an image</a>
+		<a href="sakakibaraonsen.jpg" data-jdlightbox="jdlightbox" title="An Image">
+			<img src="sakakibaraonsen.jpg" width="60">
+		</a>
+	</body>
+</html>
