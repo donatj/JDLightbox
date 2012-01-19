@@ -4,17 +4,18 @@ var JDLightbox = new Class({
 	Implements: [Options],
 
 	options: {
-		'selector': 'a[data-jdlightbox=jdlightbox]'
+		'selector'      : 'a[data-jdlightbox=jdlightbox]',
+		'fadeDuration' : 100
 	},
 
 	initialize:  function(options) { 
 		this.setOptions(options);
 		var that = this;
 		
-		this.bg = new Element("div.jdlightbox_modal_bg");
+		this.bg  = new Element("div.jdlightbox_modal_bg");
 		this.fig = new Element("figure");
 		
-		this.bg.set('tween', {duration: 100});
+		this.bg.set('tween', {duration: this.options.fadeDuration});
 		this.bg.fade('hide');
 		
 		this.bg.addEvent('click', function(){
