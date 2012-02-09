@@ -23,7 +23,6 @@ var JDLightbox = new Class({
 		})
 		
 		$$( this.options.selector ).addEvent('click', function(e,i,x){
-			console.log(e);
 			if( !e.meta && e.event.button == 0 ) {
 				that.fig.getChildren().destroy();
 				if( this.get('data-jdlightbox-iframe') ) {
