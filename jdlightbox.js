@@ -4,7 +4,7 @@ var JDLightbox = new Class({
 	Implements: [Options],
 
 	options: {
-		'selector'      : 'a[data-jdlightbox=jdlightbox]',
+		'selector'     : 'a[data-jdlightbox=jdlightbox]',
 		'fadeDuration' : 100
 	},
 
