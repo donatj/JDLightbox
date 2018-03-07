@@ -1,6 +1,6 @@
 # JDLightbox
 
-## A Damned Simple No Framework Lightbox
+## A Super Simple No Framework Lightbox
 
 Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 
