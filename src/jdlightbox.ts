@@ -5,6 +5,8 @@ interface JDLightboxOptions {
 	rootListener: HTMLElement;
 	rootLevelElement: HTMLElement;
 	bgClassName: string;
+	iframeWidth: number;
+	iframeHeight: number;
 }
 
 type JDLightboxOptionsPartial = Partial<JDLightboxOptions>;
@@ -21,6 +23,8 @@ class JDLightbox {
 		rootListener: <HTMLElement>document.querySelector('html'),
 		rootLevelElement: <HTMLElement>document.querySelector('html'),
 		bgClassName: 'jdlightbox_modal_bg',
+		iframeWidth: 800,
+		iframeHeight: 600,
 	};
 
 	constructor(options: JDLightboxOptionsPartial) {
@@ -61,15 +65,14 @@ class JDLightbox {
 
 	private show(target: HTMLElement) {
 		this.fig.innerHTML = '';
-
 		this.bg.style.display = '';
 		this.bg.style.opacity = '0';
 
 		if (target.hasAttribute('data-jdlightbox-iframe')) {
 			const iframe = document.createElement('iframe');
 			iframe.src = target.getAttribute(this.options.lbAttr) || '';
-			iframe.width = '800';
-			iframe.height = '600';
+			iframe.width = `${this.options.iframeWidth}`;
+			iframe.height = `${this.options.iframeHeight}`;
 		} else {
 			const img = document.createElement('img');
 			img.src = target.getAttribute(this.options.lbAttr) || '';
