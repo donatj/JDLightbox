@@ -7,6 +7,8 @@ interface JDLightboxOptions {
 	bgClassName: string;
 }
 
+type JDLightboxOptionsPartial = Partial<JDLightboxOptions>;
+
 class JDLightbox {
 
 	protected bg = document.createElement('div');
@@ -21,7 +23,7 @@ class JDLightbox {
 		bgClassName: 'jdlightbox_modal_bg',
 	};
 
-	constructor(options: JDLightboxOptions) {
+	constructor(options: JDLightboxOptionsPartial) {
 		this.options = { ...this.options, ...options };
 
 		this.bg.classList.add(this.options.bgClassName);
