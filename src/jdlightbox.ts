@@ -20,8 +20,8 @@ class JDLightbox {
 		selector: 'a[data-jdlightbox=jdlightbox]',
 		lbAttr: "href",
 		fadeDuration: 400,
-		rootListener: <HTMLElement>document.querySelector('html'),
-		rootLevelElement: <HTMLElement>document.querySelector('html'),
+		rootListener: document.documentElement,
+		rootLevelElement: document.documentElement,
 		bgClassName: 'jdlightbox_modal_bg',
 		iframeWidth: 800,
 		iframeHeight: 600,
@@ -50,7 +50,10 @@ class JDLightbox {
 			}
 
 			for (let target = <HTMLElement | null>e.target; target && target != this; target = target.parentElement) {
-				if (target.matches(that.options.selector)) {
+				if (
+					(target.msMatchesSelector && target.msMatchesSelector(that.options.selector)) // IE
+					|| target.matches(that.options.selector)
+				) {
 					e.preventDefault();
 					that.show(target);
 					return;
