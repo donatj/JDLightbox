@@ -1,16 +1,16 @@
-JDLightbox
-==========
+# JDLightbox
 
-A Damned Simple MooTools Lightbox
----------------------------------
+## A Damned Simple No Framework Lightbox
 
 Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 
 Example Usage
 -------------
 
-	<script>
-		window.addEvent('domready', function(){
-			new JDLightbox();
-		});
-	</script>
+```html
+<script>
+	document.addEventListener('DOMContentLoaded', function(){
+		new JDLightbox();
+	});
+</script>
+```
