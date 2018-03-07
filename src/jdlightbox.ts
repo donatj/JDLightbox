@@ -53,7 +53,7 @@ class JDLightbox {
 				if (target.matches(that.options.selector)) {
 					e.preventDefault();
 					that.show(target);
-					break;
+					return;
 				}
 			}
 		});
@@ -73,15 +73,17 @@ class JDLightbox {
 			iframe.src = target.getAttribute(this.options.lbAttr) || '';
 			iframe.width = `${this.options.iframeWidth}`;
 			iframe.height = `${this.options.iframeHeight}`;
+
+			this.fig.appendChild(iframe);
 		} else {
 			const img = document.createElement('img');
 			img.src = target.getAttribute(this.options.lbAttr) || '';
 			this.fig.appendChild(img);
-
-			const caption = document.createElement('figcaption');
-			caption.innerText = target.title;
-			this.fig.appendChild(caption);
 		}
+
+		const caption = document.createElement('figcaption');
+		caption.innerText = target.title;
+		this.fig.appendChild(caption);
 
 		setTimeout(() => { this.bg.style.opacity = '1'; }, 1);
 
