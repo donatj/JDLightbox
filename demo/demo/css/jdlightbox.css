@@ -1,0 +1,21 @@
+.jdlightbox_modal_bg {
+  background: rgba(0, 0, 0, 0.8);
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0; }
+  .jdlightbox_modal_bg figure {
+    background: #222;
+    color: white;
+    display: table;
+    margin: 22px auto;
+    font: 12px/20px Arial;
+    max-width: 95%;
+    box-shadow: 0 0 10px black; }
+  .jdlightbox_modal_bg figcaption {
+    text-align: center; }
+  .jdlightbox_modal_bg figure img {
+    max-width: 100%; }
