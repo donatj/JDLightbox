@@ -2,7 +2,7 @@
 	"extends": "tslint:recommended",
 	"rules": {
 		"class-name": true,
-		// "comment-format": [true, "check-space"],
+		
 		"indent": [
 			true,
 			"tabs"
@@ -14,11 +14,14 @@
 		"triple-equals": false,
 		"whitespace": false,
 		"max-line-length": false,
-		"eofline": false,
+		"eofline": true,
 		"no-empty": false,
 		"one-variable-per-declaration": false,
 		"member-ordering": false,
 		"max-classes-per-file": false,
-		"no-bitwise": false
+		"no-bitwise": false,
+		"no-console": false,
+		"new-parens": false,
+		"object-literal-sort-keys": false
 	}
 }
