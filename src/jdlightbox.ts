@@ -38,22 +38,19 @@ class JDLightbox {
 		this.bg.appendChild(this.fig);
 		this.options.rootLevelElement.appendChild(this.bg);
 
-		let that = this;
+		const that = this;
 
 		that.bg.addEventListener('click', () => {
 			this.hide();
 		});
 
-		this.options.rootListener.addEventListener('click', function (e) {
+		this.options.rootListener.addEventListener('click', function(e) {
 			if (e.metaKey) {
 				return;
 			}
 
-			for (let target = <HTMLElement | null>e.target; target && target != this; target = target.parentElement) {
-				if (
-					(target.msMatchesSelector && target.msMatchesSelector(that.options.selector)) // IE
-					|| target.matches(that.options.selector)
-				) {
+			for (let target = e.target as HTMLElement | null; target && target != this; target = target.parentElement) {
+				if (target.matches(that.options.selector)) {
 					e.preventDefault();
 					that.show(target);
 					return;
@@ -66,7 +63,7 @@ class JDLightbox {
 		this.bg.style.display = 'none';
 	}
 
-	private show(target: HTMLElement) {
+	private async show(target: HTMLElement) {
 		this.fig.innerHTML = '';
 		this.bg.style.display = '';
 		this.bg.style.opacity = '0';
