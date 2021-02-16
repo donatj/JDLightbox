@@ -63,7 +63,7 @@ class JDLightbox {
 		this.bg.style.display = 'none';
 	}
 
-	private async show(target: HTMLElement) {
+	private show(target: HTMLElement) {
 		this.fig.innerHTML = '';
 		this.bg.style.display = '';
 		this.bg.style.opacity = '0';
