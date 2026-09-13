@@ -1,92 +1,95 @@
 interface JDLightboxOptions {
-	selector: string;
-	lbAttr: string;
-	fadeDuration: number;
-	rootListener: HTMLElement;
-	rootLevelElement: HTMLElement;
-	bgClassName: string;
-	iframeWidth: number;
-	iframeHeight: number;
+  selector: string;
+  lbAttr: string;
+  fadeDuration: number;
+  rootListener: HTMLElement;
+  rootLevelElement: HTMLElement;
+  bgClassName: string;
+  iframeWidth: number;
+  iframeHeight: number;
 }
 
 type JDLightboxOptionsPartial = Partial<JDLightboxOptions>;
 
 class JDLightbox {
+  protected bg = document.createElement("div");
+  protected fig = document.createElement("figure");
 
-	protected bg = document.createElement('div');
-	protected fig = document.createElement('figure');
+  protected options: JDLightboxOptions = {
+    selector: "a[data-jdlightbox=jdlightbox]",
+    lbAttr: "href",
+    fadeDuration: 400,
+    rootListener: document.documentElement,
+    rootLevelElement: document.documentElement,
+    bgClassName: "jdlightbox_modal_bg",
+    iframeWidth: 800,
+    iframeHeight: 600,
+  };
 
-	protected options: JDLightboxOptions = {
-		selector: 'a[data-jdlightbox=jdlightbox]',
-		lbAttr: "href",
-		fadeDuration: 400,
-		rootListener: document.documentElement,
-		rootLevelElement: document.documentElement,
-		bgClassName: 'jdlightbox_modal_bg',
-		iframeWidth: 800,
-		iframeHeight: 600,
-	};
+  constructor(options: JDLightboxOptionsPartial) {
+    this.options = { ...this.options, ...options };
 
-	constructor(options: JDLightboxOptionsPartial) {
-		this.options = { ...this.options, ...options };
+    this.bg.classList.add(this.options.bgClassName);
+    this.hide();
 
-		this.bg.classList.add(this.options.bgClassName);
-		this.hide();
+    this.bg.style.transition = this.options.fadeDuration + "ms";
 
-		this.bg.style.transition = this.options.fadeDuration + 'ms';
+    this.bg.appendChild(this.fig);
+    this.options.rootLevelElement.appendChild(this.bg);
 
-		this.bg.appendChild(this.fig);
-		this.options.rootLevelElement.appendChild(this.bg);
+    const that = this;
 
-		const that = this;
+    that.bg.addEventListener("click", () => {
+      this.hide();
+    });
 
-		that.bg.addEventListener('click', () => {
-			this.hide();
-		});
+    this.options.rootListener.addEventListener("click", function (e) {
+      if (e.metaKey) {
+        return;
+      }
 
-		this.options.rootListener.addEventListener('click', function(e) {
-			if (e.metaKey) {
-				return;
-			}
+      for (
+        let target = e.target as HTMLElement | null;
+        target && target != this;
+        target = target.parentElement
+      ) {
+        if (target.matches(that.options.selector)) {
+          e.preventDefault();
+          that.show(target);
+          return;
+        }
+      }
+    });
+  }
 
-			for (let target = e.target as HTMLElement | null; target && target != this; target = target.parentElement) {
-				if (target.matches(that.options.selector)) {
-					e.preventDefault();
-					that.show(target);
-					return;
-				}
-			}
-		});
-	}
+  private hide() {
+    this.bg.style.display = "none";
+  }
 
-	private hide() {
-		this.bg.style.display = 'none';
-	}
+  private show(target: HTMLElement) {
+    this.fig.innerHTML = "";
+    this.bg.style.display = "";
+    this.bg.style.opacity = "0";
 
-	private show(target: HTMLElement) {
-		this.fig.innerHTML = '';
-		this.bg.style.display = '';
-		this.bg.style.opacity = '0';
+    if (target.hasAttribute("data-jdlightbox-iframe")) {
+      const iframe = document.createElement("iframe");
+      iframe.src = target.getAttribute(this.options.lbAttr) || "";
+      iframe.width = `${this.options.iframeWidth}`;
+      iframe.height = `${this.options.iframeHeight}`;
 
-		if (target.hasAttribute('data-jdlightbox-iframe')) {
-			const iframe = document.createElement('iframe');
-			iframe.src = target.getAttribute(this.options.lbAttr) || '';
-			iframe.width = `${this.options.iframeWidth}`;
-			iframe.height = `${this.options.iframeHeight}`;
+      this.fig.appendChild(iframe);
+    } else {
+      const img = document.createElement("img");
+      img.src = target.getAttribute(this.options.lbAttr) || "";
+      this.fig.appendChild(img);
+    }
 
-			this.fig.appendChild(iframe);
-		} else {
-			const img = document.createElement('img');
-			img.src = target.getAttribute(this.options.lbAttr) || '';
-			this.fig.appendChild(img);
-		}
+    const caption = document.createElement("figcaption");
+    caption.innerText = target.title;
+    this.fig.appendChild(caption);
 
-		const caption = document.createElement('figcaption');
-		caption.innerText = target.title;
-		this.fig.appendChild(caption);
-
-		setTimeout(() => { this.bg.style.opacity = '1'; }, 1);
-
-	}
-
+    setTimeout(() => {
+      this.bg.style.opacity = "1";
+    }, 1);
+  }
 }
