@@ -1,22 +1,23 @@
 {
   "name": "jdlightbox",
   "version": "2.0.0",
-  "description": "Super Simple No Frills No Framework Lightbox",
-  "main": "index.js",
-  "directories": {
-    "lib": "lib"
-  },
+  "description": "A simple, framework-free lightbox",
+  "main": "lib/jdlightbox.js",
+  "types": "lib/jdlightbox.d.ts",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "build": "tsc",
-    "lint": "tslint -c tslint.json src/**/*.ts --fix",
-    "test": "tslint -c tslint.json src/**/*.ts"
+    "test": "tsc --noEmit && node --test test/view.test.cjs && node test/browser.cjs"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/donatj/JDLightbox.git"
   },
   "keywords": [
-    "Lightbox"
+    "lightbox",
+    "image-gallery"
   ],
   "author": "Jesse G. Donat",
   "license": "MIT",
@@ -25,7 +26,7 @@
   },
   "homepage": "https://github.com/donatj/JDLightbox#readme",
   "devDependencies": {
-    "tslint": "^6.1.3",
-    "typescript": "^4.9.5"
+    "playwright-core": "^1.58.1",
+    "typescript": "^7.0.2"
   }
 }
