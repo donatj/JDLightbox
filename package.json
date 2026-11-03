@@ -27,6 +27,6 @@
   "homepage": "https://github.com/donatj/JDLightbox#readme",
   "devDependencies": {
     "playwright-core": "^1.58.1",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   }
 }
