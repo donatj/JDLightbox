@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>JDLightbox tests</title></head>
+<body>
+<a id="image" href="../demo/images/sakakibaraonsen.jpg" data-jdlightbox title="A &lt;picture&gt;"><span>View</span></a>
+<a id="frame" href="about:blank" data-jdlightbox data-jdlightbox-iframe title="A frame">Frame</a>
+<a id="new-tab" href="about:blank" data-jdlightbox target="_blank">New tab</a>
+<script src="../lib/jdlightbox.js"></script>
+<script>
+(async () => {
+	const assert = (condition, message) => { if (!condition) throw new Error(message); };
+	const click = (element, options = {}) => {
+		const event = new MouseEvent('click', { bubbles: true, cancelable: true, ...options });
+		let defaultPrevented = false;
+		window.addEventListener('click', e => {
+			defaultPrevented = e.defaultPrevented;
+			e.preventDefault();
+		}, { once: true });
+		element.dispatchEvent(event);
+		return { defaultPrevented };
+	};
+	const waitForClose = dialog => new Promise((resolve, reject) => {
+		const timeout = setTimeout(() => reject(new Error('Close event did not fire')), 2000);
+		dialog.addEventListener('close', () => { clearTimeout(timeout); resolve(); }, { once: true });
+	});
+	try {
+		const lightbox = new JDLightbox();
+		const dialog = document.querySelector('dialog');
+		const imageLink = document.querySelector('#image');
+		assert(!click(imageLink, { ctrlKey: true }).defaultPrevented, 'Modified clicks should keep their normal behavior');
+		assert(!click(document.querySelector('#new-tab')).defaultPrevented, 'Links with a target should keep their normal behavior');
+		assert(click(imageLink.querySelector('span')).defaultPrevented, 'Nested content should open the lightbox');
+		assert(dialog.open && dialog.matches(':modal'), 'The lightbox should be modal');
+		assert(dialog.querySelector('img').alt === 'A <picture>', 'The image should have descriptive alternative text');
+		assert(dialog.querySelector('.jdlightbox__caption').textContent === 'A <picture>', 'The caption should be plain text');
+		assert(dialog.querySelector('.jdlightbox__original').href === imageLink.href, 'The original link should point to the image');
+		click(dialog.querySelector('img'));
+		assert(dialog.open, 'Clicking the content should not close the lightbox');
+		let closed = waitForClose(dialog);
+		click(dialog.querySelector('button'));
+		await closed;
+		assert(!dialog.open && !dialog.querySelector('img'), 'Closing should remove the image');
+		click(document.querySelector('#frame'));
+		assert(dialog.querySelector('iframe').title === 'A frame', 'The frame should have an accessible title');
+		closed = waitForClose(dialog);
+		click(dialog);
+		await closed;
+		assert(!dialog.open && !dialog.querySelector('iframe'), 'Clicking the backdrop should close and unload the frame');
+		const dynamic = document.createElement('a');
+		dynamic.href = 'about:blank';
+		dynamic.dataset.jdlightbox = '';
+		dynamic.innerHTML = '<img alt="Thumbnail description">';
+		document.body.append(dynamic);
+		click(dynamic);
+		assert(dialog.querySelector('.jdlightbox__content img').alt === 'Thumbnail description', 'Dynamic links should use the thumbnail alternative text');
+		lightbox.destroy();
+		assert(!document.querySelector('dialog'), 'Destroy should remove the dialog');
+		assert(!click(dynamic).defaultPrevented, 'Destroy should remove the listener');
+		document.body.dataset.result = 'passed';
+	} catch (error) {
+		document.body.dataset.result = 'failed';
+		document.body.textContent = error.stack || String(error);
+	}
+})();
+</script>
+</body>
+</html>

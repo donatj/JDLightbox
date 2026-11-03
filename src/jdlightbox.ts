@@ -1,92 +1,91 @@
 interface JDLightboxOptions {
-	selector: string;
-	lbAttr: string;
-	fadeDuration: number;
-	rootListener: HTMLElement;
-	rootLevelElement: HTMLElement;
-	bgClassName: string;
-	iframeWidth: number;
-	iframeHeight: number;
+	/** Selector for links that should open in the lightbox. */
+	selector?: string;
 }
 
-type JDLightboxOptionsPartial = Partial<JDLightboxOptions>;
-
 class JDLightbox {
+	private readonly selector: string;
+	private readonly dialog: HTMLDialogElement;
+	private readonly content: HTMLElement;
+	private readonly caption: HTMLElement;
+	private readonly original: HTMLAnchorElement;
 
-	protected bg = document.createElement('div');
-	protected fig = document.createElement('figure');
+	constructor(options: JDLightboxOptions = {}) {
+		this.selector = options.selector ?? 'a[data-jdlightbox]';
+		this.dialog = document.createElement('dialog');
+		this.dialog.className = 'jdlightbox';
+		this.dialog.setAttribute('aria-label', 'Content viewer');
 
-	protected options: JDLightboxOptions = {
-		selector: 'a[data-jdlightbox=jdlightbox]',
-		lbAttr: "href",
-		fadeDuration: 400,
-		rootListener: document.documentElement,
-		rootLevelElement: document.documentElement,
-		bgClassName: 'jdlightbox_modal_bg',
-		iframeWidth: 800,
-		iframeHeight: 600,
+		const close = document.createElement('button');
+		close.type = 'button';
+		close.className = 'jdlightbox__close';
+		close.setAttribute('aria-label', 'Close');
+		close.textContent = '×';
+		close.addEventListener('click', () => this.dialog.close());
+
+		this.content = document.createElement('div');
+		this.content.className = 'jdlightbox__content';
+		this.caption = document.createElement('p');
+		this.caption.className = 'jdlightbox__caption';
+		this.original = document.createElement('a');
+		this.original.className = 'jdlightbox__original';
+		this.original.target = '_blank';
+		this.original.rel = 'noopener noreferrer';
+		this.original.textContent = 'Open original';
+
+		this.dialog.append(close, this.content, this.caption, this.original);
+		document.body.append(this.dialog);
+		this.dialog.addEventListener('click', this.onDialogClick);
+		this.dialog.addEventListener('close', this.onClose);
+		document.addEventListener('click', this.onClick);
+	}
+
+	/** Remove the lightbox and its event listener. */
+	destroy(): void {
+		document.removeEventListener('click', this.onClick);
+		if (this.dialog.open) this.dialog.close();
+		this.dialog.remove();
+	}
+
+	private readonly onClick = (event: MouseEvent): void => {
+		if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+		if (!(event.target instanceof Element)) return;
+		const link = event.target.closest(this.selector);
+		if (!(link instanceof HTMLAnchorElement) || !link.getAttribute('href') || link.hasAttribute('download') || (link.target && link.target.toLowerCase() !== '_self')) return;
+
+		event.preventDefault();
+		this.show(link);
 	};
 
-	constructor(options: JDLightboxOptionsPartial) {
-		this.options = { ...this.options, ...options };
+	private readonly onDialogClick = (event: MouseEvent): void => {
+		if (event.target === this.dialog) this.dialog.close();
+	};
 
-		this.bg.classList.add(this.options.bgClassName);
-		this.hide();
+	private readonly onClose = (): void => {
+		// A close event can arrive after the dialog has already been reopened.
+		if (this.dialog.open) return;
+		this.content.replaceChildren();
+		this.caption.textContent = '';
+		this.original.removeAttribute('href');
+	};
 
-		this.bg.style.transition = this.options.fadeDuration + 'ms';
-
-		this.bg.appendChild(this.fig);
-		this.options.rootLevelElement.appendChild(this.bg);
-
-		const that = this;
-
-		that.bg.addEventListener('click', () => {
-			this.hide();
-		});
-
-		this.options.rootListener.addEventListener('click', function(e) {
-			if (e.metaKey) {
-				return;
-			}
-
-			for (let target = e.target as HTMLElement | null; target && target != this; target = target.parentElement) {
-				if (target.matches(that.options.selector)) {
-					e.preventDefault();
-					that.show(target);
-					return;
-				}
-			}
-		});
-	}
-
-	private hide() {
-		this.bg.style.display = 'none';
-	}
-
-	private show(target: HTMLElement) {
-		this.fig.innerHTML = '';
-		this.bg.style.display = '';
-		this.bg.style.opacity = '0';
-
-		if (target.hasAttribute('data-jdlightbox-iframe')) {
-			const iframe = document.createElement('iframe');
-			iframe.src = target.getAttribute(this.options.lbAttr) || '';
-			iframe.width = `${this.options.iframeWidth}`;
-			iframe.height = `${this.options.iframeHeight}`;
-
-			this.fig.appendChild(iframe);
+	private show(link: HTMLAnchorElement): void {
+		const title = link.title || link.querySelector('img')?.alt || '';
+		this.content.replaceChildren();
+		if (link.hasAttribute('data-jdlightbox-iframe')) {
+			const frame = document.createElement('iframe');
+			frame.src = link.href;
+			frame.title = title || 'Embedded content';
+			this.content.append(frame);
 		} else {
-			const img = document.createElement('img');
-			img.src = target.getAttribute(this.options.lbAttr) || '';
-			this.fig.appendChild(img);
+			const image = document.createElement('img');
+			image.src = link.href;
+			image.alt = title;
+			this.content.append(image);
 		}
-
-		const caption = document.createElement('figcaption');
-		caption.innerText = target.title;
-		this.fig.appendChild(caption);
-
-		setTimeout(() => { this.bg.style.opacity = '1'; }, 1);
-
+		this.caption.textContent = title;
+		this.caption.hidden = !title;
+		this.original.href = link.href;
+		if (!this.dialog.open) this.dialog.showModal();
 	}
-
 }

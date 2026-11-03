@@ -1,23 +1,23 @@
 <!doctype html>
-<html>
-	<head>
-		<script src="../lib/jdlightbox.js"></script>
-		<script>
-		document.addEventListener('DOMContentLoaded', function(){
-			new JDLightbox();
-		});
-		</script>
-		<link href="css/jdlightbox.css" media="screen" rel="stylesheet" type="text/css" />
-	</head>
-	<body>
-		<a href="images/sakakibaraonsen.jpg" data-jdlightbox="jdlightbox" title="Not An Image">A Link to an Image</a>
-		
-		<br /><br />
-		
-		<a href="https://donatstudios.com" data-jdlightbox="jdlightbox" data-jdlightbox-iframe=true title="An Awesome iFrame">iFrame Bro</a>
-		
-		<br /><br />
-		
-		<a href="images/sakakibaraonsen.jpg" data-jdlightbox="jdlightbox" title="An Image"><img src="images/sakakibaraonsen.jpg" width="200"></a>
-	</body>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>JDLightbox demo</title>
+	<link rel="stylesheet" href="../lib/jdlightbox.css">
+	<style>
+		body { max-width: 48rem; margin: 3rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
+		img { max-width: 100%; height: auto; }
+	</style>
+</head>
+<body>
+	<h1>JDLightbox</h1>
+	<p>Open an image or an embedded page.</p>
+	<a href="images/sakakibaraonsen.jpg" data-jdlightbox title="Sakakibara Onsen">
+		<img src="images/sakakibaraonsen.jpg" width="320" alt="Sakakibara Onsen">
+	</a>
+	<p><a href="frame.html" data-jdlightbox data-jdlightbox-iframe title="Embedded page">Open an embedded page</a></p>
+	<script src="../lib/jdlightbox.js"></script>
+	<script>new JDLightbox();</script>
+</body>
 </html>
