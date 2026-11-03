@@ -3,9 +3,40 @@ interface JDLightboxOptions {
 	selector?: string;
 }
 
+interface LightboxItem {
+	href: string;
+	title: string;
+	thumbnailAlt: string;
+	isFrame: boolean;
+}
+
+interface LightboxView {
+	href: string;
+	title: string;
+	isFrame: boolean;
+	showNavigation: boolean;
+	canGoPrevious: boolean;
+	canGoNext: boolean;
+}
+
 function adjacentIndex(index: number, count: number, direction: -1 | 1): number | null {
 	const next = index + direction;
-	return index >= 0 && next >= 0 && next < count ? next : null;
+	return index >= 0 && index < count && next >= 0 && next < count ? next : null;
+}
+
+function lightboxView(item: LightboxItem, index: number, count: number): LightboxView {
+	return {
+		href: item.href,
+		title: item.title || item.thumbnailAlt,
+		isFrame: item.isFrame,
+		showNavigation: count > 1,
+		canGoPrevious: adjacentIndex(index, count, -1) !== null,
+		canGoNext: adjacentIndex(index, count, 1) !== null,
+	};
+}
+
+function isEligibleLink(link: Element | null): link is HTMLAnchorElement {
+	return link instanceof HTMLAnchorElement && !!link.getAttribute('href') && !link.hasAttribute('download') && (!link.target || link.target.toLowerCase() === '_self');
 }
 
 class JDLightbox {
@@ -65,7 +96,7 @@ class JDLightbox {
 		if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 		if (!(event.target instanceof Element)) return;
 		const link = event.target.closest(this.selector);
-		if (!(link instanceof HTMLAnchorElement) || !link.getAttribute('href') || link.hasAttribute('download') || (link.target && link.target.toLowerCase() !== '_self')) return;
+		if (!isEligibleLink(link)) return;
 
 		event.preventDefault();
 		this.show(link);
@@ -82,9 +113,7 @@ class JDLightbox {
 	}
 
 	private links(): HTMLAnchorElement[] {
-		return Array.from(document.querySelectorAll(this.selector)).filter((link): link is HTMLAnchorElement =>
-			link instanceof HTMLAnchorElement && !!link.getAttribute('href') && !link.hasAttribute('download') && (!link.target || link.target.toLowerCase() === '_self')
-		);
+		return Array.from(document.querySelectorAll(this.selector)).filter(isEligibleLink);
 	}
 
 	private navigate(direction: -1 | 1): void {
@@ -118,26 +147,34 @@ class JDLightbox {
 	private show(link: HTMLAnchorElement): void {
 		this.current = link;
 		const links = this.links();
-		const index = links.indexOf(link);
-		this.previous.hidden = this.next.hidden = links.length < 2;
-		this.previous.disabled = adjacentIndex(index, links.length, -1) === null;
-		this.next.disabled = adjacentIndex(index, links.length, 1) === null;
-		const title = link.title || link.querySelector('img')?.alt || '';
+		const item: LightboxItem = {
+			href: link.href,
+			title: link.title,
+			thumbnailAlt: link.querySelector('img')?.alt || '',
+			isFrame: link.hasAttribute('data-jdlightbox-iframe'),
+		};
+		this.render(lightboxView(item, links.indexOf(link), links.length));
+		if (!this.dialog.open) this.dialog.showModal();
+	}
+
+	private render(view: LightboxView): void {
+		this.previous.hidden = this.next.hidden = !view.showNavigation;
+		this.previous.disabled = !view.canGoPrevious;
+		this.next.disabled = !view.canGoNext;
 		this.content.replaceChildren();
-		if (link.hasAttribute('data-jdlightbox-iframe')) {
+		if (view.isFrame) {
 			const frame = document.createElement('iframe');
-			frame.src = link.href;
-			frame.title = title || 'Embedded content';
+			frame.src = view.href;
+			frame.title = view.title || 'Embedded content';
 			this.content.append(frame);
 		} else {
 			const image = document.createElement('img');
-			image.src = link.href;
-			image.alt = title;
+			image.src = view.href;
+			image.alt = view.title;
 			this.content.append(image);
 		}
-		this.caption.textContent = title;
-		this.caption.hidden = !title;
-		this.original.href = link.href;
-		if (!this.dialog.open) this.dialog.showModal();
+		this.caption.textContent = view.title;
+		this.caption.hidden = !view.title;
+		this.original.href = view.href;
 	}
 }

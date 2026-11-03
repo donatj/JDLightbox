@@ -4,6 +4,8 @@
 <body>
 <a id="image" href="../demo/images/sakakibaraonsen.jpg" data-jdlightbox title="A &lt;picture&gt;"><span>View</span></a>
 <a id="frame" href="about:blank" data-jdlightbox data-jdlightbox-iframe title="A frame">Frame</a>
+<a id="download" href="about:blank" data-jdlightbox download>Download</a>
+<a id="empty" href="" data-jdlightbox>Empty</a>
 <a id="new-tab" href="about:blank" data-jdlightbox target="_blank">New tab</a>
 <script src="../lib/jdlightbox.js"></script>
 <script>
@@ -29,6 +31,8 @@
 		const imageLink = document.querySelector('#image');
 		assert(!click(imageLink, { ctrlKey: true }).defaultPrevented, 'Modified clicks should keep their normal behavior');
 		assert(!click(document.querySelector('#new-tab')).defaultPrevented, 'Links with a target should keep their normal behavior');
+		assert(!click(document.querySelector('#download')).defaultPrevented, 'Download links should keep their normal behavior');
+		assert(!click(document.querySelector('#empty')).defaultPrevented, 'Empty links should keep their normal behavior');
 		assert(click(imageLink.querySelector('span')).defaultPrevented, 'Nested content should open the lightbox');
 		assert(dialog.open && dialog.matches(':modal'), 'The lightbox should be modal');
 		assert(dialog.querySelector('img').alt === 'A <picture>', 'The image should have descriptive alternative text');
@@ -69,7 +73,7 @@
 		assert(dialog.querySelector('.jdlightbox__content img').alt === 'Thumbnail description', 'Dynamic links should use the thumbnail alternative text');
 		assert(!previous.disabled && next.disabled, 'Dynamic links should appear in the navigation order');
 		click(previous);
-		assert(dialog.querySelector('iframe'), 'Previous should skip links with a target');
+		assert(dialog.querySelector('iframe'), 'Previous should skip ineligible links');
 		lightbox.destroy();
 		assert(!document.querySelector('dialog'), 'Destroy should remove the dialog');
 		assert(!click(dynamic).defaultPrevented, 'Destroy should remove the listener');

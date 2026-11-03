@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "tsc --noEmit && node test/browser.cjs"
+    "test": "tsc --noEmit && node --test test/view.test.cjs && node test/browser.cjs"
   },
   "repository": {
     "type": "git",
