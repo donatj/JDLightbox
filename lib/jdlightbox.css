@@ -40,3 +40,23 @@
 .jdlightbox__caption { margin: 0.75rem 0; }
 .jdlightbox__original { display: inline-block; margin-top: 0.5rem; color: #fff; }
 .jdlightbox a:focus-visible, .jdlightbox button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+.jdlightbox__viewer {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+.jdlightbox__content { min-width: 0; }
+.jdlightbox__navigation {
+	flex: none;
+	padding: 0.25rem;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-size: 2rem;
+	line-height: 1;
+	cursor: pointer;
+}
+.jdlightbox__navigation:disabled { opacity: 0.35; cursor: default; }
+.jdlightbox__navigation[hidden] { display: none; }

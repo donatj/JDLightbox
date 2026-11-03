@@ -29,6 +29,8 @@ Add `data-jdlightbox-iframe` to show an embedded page instead of an image. Use a
 
 Click the close button, click outside the content, or press Escape to close the dialog. The original link is available inside the dialog. Modified clicks, download links, and links with a target other than `_self` keep their normal behavior.
 
+The previous and next buttons move through matching links in page order. The left and right arrow keys also navigate when focus is in the dialog. Navigation stops at either end. Links added later are included. Download links and links with a target other than `_self` are skipped. Arrow keys inside an embedded page are handled by that page.
+
 The lightbox listens for clicks on the document. Links added later work without further setup. You can supply a different selector or remove an instance when it is no longer needed:
 
 ```js

@@ -34,6 +34,20 @@
 		assert(dialog.querySelector('img').alt === 'A <picture>', 'The image should have descriptive alternative text');
 		assert(dialog.querySelector('.jdlightbox__caption').textContent === 'A <picture>', 'The caption should be plain text');
 		assert(dialog.querySelector('.jdlightbox__original').href === imageLink.href, 'The original link should point to the image');
+		const previous = dialog.querySelector('[aria-label="Previous"]');
+		const next = dialog.querySelector('[aria-label="Next"]');
+		assert(!previous.hidden && previous.disabled && !next.disabled, 'The first item should have only a next item');
+		click(next);
+		assert(dialog.querySelector('iframe') && dialog.querySelector('.jdlightbox__caption').textContent === 'A frame', 'Next should show the frame');
+		assert(!previous.disabled && next.disabled, 'Navigation should stop at the last eligible link');
+		click(previous);
+		assert(dialog.querySelector('.jdlightbox__content img'), 'Previous should return to the image');
+		dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+		assert(dialog.querySelector('iframe'), 'The right arrow should show the next item');
+		dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+		assert(dialog.querySelector('.jdlightbox__content img'), 'The left arrow should show the previous item');
+		dialog.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', ctrlKey: true, bubbles: true }));
+		assert(dialog.querySelector('.jdlightbox__content img'), 'Modified arrow keys should keep their normal behavior');
 		click(dialog.querySelector('img'));
 		assert(dialog.open, 'Clicking the content should not close the lightbox');
 		let closed = waitForClose(dialog);
@@ -53,9 +67,17 @@
 		document.body.append(dynamic);
 		click(dynamic);
 		assert(dialog.querySelector('.jdlightbox__content img').alt === 'Thumbnail description', 'Dynamic links should use the thumbnail alternative text');
+		assert(!previous.disabled && next.disabled, 'Dynamic links should appear in the navigation order');
+		click(previous);
+		assert(dialog.querySelector('iframe'), 'Previous should skip links with a target');
 		lightbox.destroy();
 		assert(!document.querySelector('dialog'), 'Destroy should remove the dialog');
 		assert(!click(dynamic).defaultPrevented, 'Destroy should remove the listener');
+		const single = new JDLightbox({ selector: '#image' });
+		click(imageLink);
+		const singleDialog = document.querySelector('dialog');
+		assert(singleDialog.querySelector('[aria-label="Previous"]').hidden && singleDialog.querySelector('[aria-label="Next"]').hidden, 'A single item should not show navigation');
+		single.destroy();
 		document.body.dataset.result = 'passed';
 	} catch (error) {
 		document.body.dataset.result = 'failed';

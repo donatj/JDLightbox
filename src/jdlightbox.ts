@@ -3,12 +3,20 @@ interface JDLightboxOptions {
 	selector?: string;
 }
 
+function adjacentIndex(index: number, count: number, direction: -1 | 1): number | null {
+	const next = index + direction;
+	return index >= 0 && next >= 0 && next < count ? next : null;
+}
+
 class JDLightbox {
 	private readonly selector: string;
 	private readonly dialog: HTMLDialogElement;
 	private readonly content: HTMLElement;
 	private readonly caption: HTMLElement;
 	private readonly original: HTMLAnchorElement;
+	private readonly previous: HTMLButtonElement;
+	private readonly next: HTMLButtonElement;
+	private current: HTMLAnchorElement | null = null;
 
 	constructor(options: JDLightboxOptions = {}) {
 		this.selector = options.selector ?? 'a[data-jdlightbox]';
@@ -23,6 +31,8 @@ class JDLightbox {
 		close.textContent = '×';
 		close.addEventListener('click', () => this.dialog.close());
 
+		this.previous = this.createNavigationButton('Previous', '‹', -1);
+		this.next = this.createNavigationButton('Next', '›', 1);
 		this.content = document.createElement('div');
 		this.content.className = 'jdlightbox__content';
 		this.caption = document.createElement('p');
@@ -33,10 +43,14 @@ class JDLightbox {
 		this.original.rel = 'noopener noreferrer';
 		this.original.textContent = 'Open original';
 
-		this.dialog.append(close, this.content, this.caption, this.original);
+		const viewer = document.createElement('div');
+		viewer.className = 'jdlightbox__viewer';
+		viewer.append(this.previous, this.content, this.next);
+		this.dialog.append(close, viewer, this.caption, this.original);
 		document.body.append(this.dialog);
 		this.dialog.addEventListener('click', this.onDialogClick);
 		this.dialog.addEventListener('close', this.onClose);
+		this.dialog.addEventListener('keydown', this.onKeyDown);
 		document.addEventListener('click', this.onClick);
 	}
 
@@ -57,6 +71,37 @@ class JDLightbox {
 		this.show(link);
 	};
 
+	private createNavigationButton(label: string, text: string, direction: -1 | 1): HTMLButtonElement {
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'jdlightbox__navigation';
+		button.setAttribute('aria-label', label);
+		button.textContent = text;
+		button.addEventListener('click', () => this.navigate(direction));
+		return button;
+	}
+
+	private links(): HTMLAnchorElement[] {
+		return Array.from(document.querySelectorAll(this.selector)).filter((link): link is HTMLAnchorElement =>
+			link instanceof HTMLAnchorElement && !!link.getAttribute('href') && !link.hasAttribute('download') && (!link.target || link.target.toLowerCase() === '_self')
+		);
+	}
+
+	private navigate(direction: -1 | 1): void {
+		const links = this.links();
+		const index = this.current ? links.indexOf(this.current) : -1;
+		const next = adjacentIndex(index, links.length, direction);
+		if (next !== null) this.show(links[next]);
+	}
+
+	private readonly onKeyDown = (event: KeyboardEvent): void => {
+		if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+		if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+			event.preventDefault();
+			this.navigate(event.key === 'ArrowLeft' ? -1 : 1);
+		}
+	};
+
 	private readonly onDialogClick = (event: MouseEvent): void => {
 		if (event.target === this.dialog) this.dialog.close();
 	};
@@ -64,12 +109,19 @@ class JDLightbox {
 	private readonly onClose = (): void => {
 		// A close event can arrive after the dialog has already been reopened.
 		if (this.dialog.open) return;
+		this.current = null;
 		this.content.replaceChildren();
 		this.caption.textContent = '';
 		this.original.removeAttribute('href');
 	};
 
 	private show(link: HTMLAnchorElement): void {
+		this.current = link;
+		const links = this.links();
+		const index = links.indexOf(link);
+		this.previous.hidden = this.next.hidden = links.length < 2;
+		this.previous.disabled = adjacentIndex(index, links.length, -1) === null;
+		this.next.disabled = adjacentIndex(index, links.length, 1) === null;
 		const title = link.title || link.querySelector('img')?.alt || '';
 		this.content.replaceChildren();
 		if (link.hasAttribute('data-jdlightbox-iframe')) {
